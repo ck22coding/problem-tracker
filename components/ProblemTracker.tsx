@@ -21,10 +21,14 @@ export default function ProblemTracker() {
   const [loading, setLoading] = useState(true);
 
   async function loadProblems() {
-    const { data } = await getSupabase()
+    const { data, error } = await getSupabase()
       .from("problems")
       .select("*")
       .order("created", { ascending: false });
+    if (error) {
+      console.error("Load error:", error);
+      alert(`Failed to load: ${error.message}`);
+    }
     setProblems(data || []);
     setLoading(false);
   }
@@ -39,7 +43,12 @@ export default function ProblemTracker() {
     frequency: string;
     willingness_to_pay: string;
   }) {
-    await getSupabase().from("problems").insert(input);
+    const { error } = await getSupabase().from("problems").insert(input);
+    if (error) {
+      console.error("Insert error:", error);
+      alert(`Failed to add: ${error.message}`);
+      return;
+    }
     loadProblems();
   }
 

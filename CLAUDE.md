@@ -1,61 +1,52 @@
-# Problem Tracker
+# CLAUDE.md
 
-A problem tracking application designed to help identify and validate startup ideas by systematically cataloging problems worth solving.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Purpose
+## Project Overview
 
-This application helps entrepreneurs and innovators:
-- Record problems they encounter or observe in daily life
-- Categorize and tag problems by domain, severity, and frequency
-- Track how many people experience each problem
-- Evaluate market potential and solution feasibility
-- Prioritize problems that could become viable startup opportunities
-
-## Core Concepts
-
-### Problem Entry
-Each problem should capture:
-- **Description**: Clear articulation of the pain point
-- **Context**: Where/when the problem occurs
-- **Affected Users**: Who experiences this problem
-- **Frequency**: How often it occurs
-- **Severity**: Impact level (minor annoyance to critical blocker)
-- **Existing Solutions**: Current workarounds or competitors
-- **Source**: How you discovered this problem (personal, interview, observation)
-
-### Validation Signals
-Track evidence that a problem is worth solving:
-- Number of people who confirmed experiencing it
-- Willingness to pay for a solution
-- Time/money currently spent on workarounds
-- Market size estimates
-
-### Scoring & Prioritization
-Problems are scored based on:
-- Frequency x Severity = Pain Score
-- Market size x Willingness to pay = Opportunity Score
-- Technical feasibility x Your expertise = Execution Score
+Problem Tracker is a Next.js application for cataloging problems worth solving as potential startup ideas. Users record problems they encounter, categorize them by frequency and willingness-to-pay, and review them to identify opportunities.
 
 ## Running the App
 
 ```bash
-pip install streamlit
-streamlit run app.py
+npm install
+npm run dev
 ```
 
-## Files
+Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`.
 
-- `app.py` - Streamlit application
-- `problems.json` - Data storage (created on first save)
+## Architecture
 
-## Data Model
+Next.js App Router with client components for interactivity. Supabase JS client used directly from the browser (no API routes). Tailwind CSS for styling with a dark theme.
 
-Each problem entry:
+**Key files:**
+- `app/page.tsx` — server component shell
+- `components/ProblemTracker.tsx` — main client component (state, CRUD)
+- `components/ProblemForm.tsx` — add problem form (fixed bottom)
+- `components/ProblemCard.tsx` — single problem card
+- `components/StatsBar.tsx` — stats summary
+- `components/EmptyState.tsx` — empty state
+- `lib/supabase.ts` — Supabase client singleton
+
+**Data flow:** `useEffect` loads problems from Supabase on mount → form captures input → `insert` writes to Supabase → reload list.
+
+## Data Model (Supabase `problems` table)
+
 ```json
 {
+  "id": "int (auto)",
   "title": "string",
   "description": "string",
   "frequency": "Rare | Occasional | Frequent | Daily",
-  "created": "ISO timestamp"
+  "willingness_to_pay": "Low | Medium | High",
+  "created": "ISO timestamp (auto)"
 }
 ```
+
+## Future Features (from original vision)
+
+The app is designed to eventually support:
+- Severity ratings and pain scoring (Frequency x Severity)
+- Validation tracking (people count, market size estimates)
+- Opportunity scoring (market size x willingness to pay)
+- Problem sources (personal, interview, observation)
